@@ -1,0 +1,33 @@
+{% extends "common.twig" %}
+
+{% block head %}
+<script>
+function updateQueueInfo() {
+    $.post("{{path('get_deployment_status', {target_id: deployment_target.id})}}", function (data) {
+        
+        $("#deploy-status-info").html(data.deployed_files + " files out of " + data.total_files + " deployed");
+        $("#deploy-progress").css("width", Math.round(data.deployed_files / (data.total_files / 100)) + "%");
+        
+        if (!data.finished) {
+            window.setTimeout(function() { updateQueueInfo() }, 1000);
+        }
+    }, "json");
+}
+
+var intervalHandle;
+
+$(document).ready(function() {
+    updateQueueInfo();
+})
+</script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="progress progress-striped active">
+        <div id="deploy-progress" class="bar" style="width: 0%;"></div>
+    </div>
+
+    <div id="deploy-status-info">Deployment started</div>
+
+{% endblock %}

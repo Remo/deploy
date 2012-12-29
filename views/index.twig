@@ -1,0 +1,31 @@
+{% extends "common.twig" %}
+
+{% block content %}
+
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>Repository</th>
+        <th>Path</th>
+        <th>State</th>
+        <th></th>
+    </tr>
+
+{% for repository in repositories %}
+    <tr>
+        <td>{{ repository.name }}</td>
+        <td>{{ repository.path }}</td>
+        <td><span class="label label-success">{{ repository.state }}</span></td>
+        <td>
+            <button class="btn deploy-btn-link" data-link="{{path('edit_repository', {repository_id: repository.id})}}">edit</button>
+            <button class="btn deploy-btn-link" data-link="{{path('delete_repository', {repository_id: repository.id})}}">delete</button>
+            <button class="btn deploy-btn-link btn-primary" data-link="{{path('deploy_repository', {repository_id: repository.id})}}">deploy</button>
+        </td>
+    </tr>    
+{% else %}
+    <tr>
+        <td colspan="4">no repositories available</td>
+    </tr>
+{% endfor %}
+</table>
+
+{% endblock %}

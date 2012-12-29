@@ -1,0 +1,24 @@
+{% extends "common.twig" %}
+
+{% block content %}
+
+{% if deployment_target.last_deployed_commit %} 
+    <div class="well">
+        <p>
+        Last deployed commit is {{deployment_target.last_deployed_commit}} and was deployed on {{deployment_target.date_last_deployment}}
+        </p>
+        <form method="get" action="{{path('incremental_deploy', {target_id: deployment_target.id, commit_id: deployment_target.last_deployed_commit})}}">
+            <button class="btn btn-primary">Start incremental Deployment</button>
+        </form>
+    </div>
+{% else %}
+    <div class="well">
+        <p>No deployments so far!</p>
+
+        <form method="get" action="{{path('initial_deploy', {target_id: deployment_target.id})}}">
+            <button class="btn btn-primary">Start initial Deployment</button>
+        </form>
+    </div>
+{% endif %}
+
+{% endblock %}
