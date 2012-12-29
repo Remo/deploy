@@ -72,6 +72,7 @@ $app->get('/repository/incremental_deploy/{target_id}/{commit_id}', function($ta
     $gitCloneDirectory = $deployment_target['local_path'];
     chdir($gitCloneDirectory);    
     
+    exec(GIT_BINARY . ' pull');
     exec(GIT_BINARY . ' diff --name-status --no-renames ' . $commit_id, $output);
 
     $st = $app['pdo']->prepare("INSERT INTO deployment_queue (target_id, file, action) VALUES (:target_id, :file, 'upload')");
