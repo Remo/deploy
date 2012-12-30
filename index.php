@@ -61,8 +61,17 @@ $app->get('/repository/edit/{repository_id}', function($repository_id) use ($app
 
     $repository = $st->fetch(PDO::FETCH_ASSOC);
     
+    $stTargets = $app['pdo']->prepare("SELECT id, name, server, username, password, directory, last_deployed_commit, date_last_deployment FROM deployment_targets WHERE repository_id=:repository_id ORDER BY name");
+    $stTargets->execute(array('repository_id' => $repository_id));
+
+    $targets = array();
+    while ($row = $stTargets->fetch(PDO::FETCH_ASSOC)) {
+        $targets[] = $row;
+    }   
+    
     return $app['twig']->render('repository_edit.twig', array(
-        'repository' => $repository
+        'repository' => $repository,
+        'targets' => $targets
     ));    
 })->bind("edit_repository");
 

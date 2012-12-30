@@ -27,6 +27,32 @@
         </tr>
     </table>
         
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th>Target</th>
+            <th>Server</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Directory</th>
+        </tr>    
+        {% for target in targets %}
+            <tr>
+                <td>{{ target.name }}</td>
+                <td>{{ target.server }}</td>
+                <td>{{ target.username }}</td>
+                <td>{{ target.password }}</td>
+                <td>{{ target.directory }}</td>
+                <td>
+                    <button class="btn">delete</button>
+                </td>
+            </tr>    
+        {% else %}
+            <tr>
+                <td colspan="4">no targets available</td>
+            </tr>
+        {% endfor %}        
+    </table> 
+        
     <button class="btn btn-primary">save</button>
 </form>
 

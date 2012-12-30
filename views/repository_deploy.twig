@@ -14,8 +14,6 @@
         <td>{{ target.name }}</td>
         <td>{{ target.server }}</td>
         <td>
-            <button class="btn deploy-btn-link" data-link="">edit</button>
-            <button class="btn deploy-btn-link" data-link="">delete</button>
             <button class="btn deploy-btn-link btn-primary" data-link="{{path('deploy_target', {target_id: target.id})}}">deploy</button>
         </td>
     </tr>    
