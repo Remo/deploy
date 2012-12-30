@@ -1,0 +1,34 @@
+{% extends "common.twig" %}
+
+{% block content %}
+
+<form method="post" action="{{path('update_repository', {repository_id: repository.id})}}">
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th><label for="name">Name</label></th>
+            <td><input name="name" id="name" type="text" value="{{repository.name}}"/></td>
+        </tr>
+        <tr>
+            <th><label for="path">Path</label></th>
+            <td><input name="path" id="path" type="text" value="{{repository.path}}"/></td>
+        </tr>
+        <tr>
+            <th><label for="state">State</label></th>
+            <td>
+                <select name="state" id="state">
+                    <option{% if repository.state == 'active' %} selected="selected"{% endif %}>active</option>
+                    <option{% if repository.state == 'inactive' %} selected="selected"{% endif %}>inactive</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="local_path">Local Path</label></th>
+            <td><input name="local_path" id="local_path" type="text" value="{{repository.local_path}}"/></td>
+        </tr>
+    </table>
+        
+    <button class="btn btn-primary">save</button>
+</form>
+
+
+{% endblock %}

@@ -14,7 +14,7 @@
     <tr>
         <td>{{ repository.name }}</td>
         <td>{{ repository.path }}</td>
-        <td><span class="label label-success">{{ repository.state }}</span></td>
+        <td><span class="label label-{% if repository.state == 'active' %}success{% else %}warning{% endif %}">{{ repository.state }}</span></td>
         <td>
             <button class="btn deploy-btn-link" data-link="{{path('edit_repository', {repository_id: repository.id})}}">edit</button>
             <button class="btn deploy-btn-link" data-link="{{path('delete_repository', {repository_id: repository.id})}}">delete</button>

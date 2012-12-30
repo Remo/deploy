@@ -40,8 +40,30 @@ $app->get('/', function() use ($app) {
     ));
 });
 
-$app->get('/repository/edit/{repository_id}', function($repository_id) use ($app) {
 
+$app->post('/repository/update/{repository_id}', function($repository_id) use ($app) {
+    $st = $app['pdo']->prepare("UPDATE repositories SET name=:name, path=:path, state=:state, local_path=:local_path WHERE id=:id");
+
+    $st->execute(array(
+        ':name' => $app['request']->get('name'),
+        ':path' => $app['request']->get('path'),
+        ':state' => $app['request']->get('state'),
+        ':local_path' => $app['request']->get('local_path'),
+        ':id' => $repository_id
+    ));    
+    
+    return $app->redirect("/");
+})->bind("update_repository");
+
+$app->get('/repository/edit/{repository_id}', function($repository_id) use ($app) {
+    $st = $app['pdo']->prepare("SELECT * FROM repositories WHERE id=:repository_id");
+    $st->execute(array('repository_id' => $repository_id));
+
+    $repository = $st->fetch(PDO::FETCH_ASSOC);
+    
+    return $app['twig']->render('repository_edit.twig', array(
+        'repository' => $repository
+    ));    
 })->bind("edit_repository");
 
 $app->get('/repository/delete/{repository_id}', function($repository_id) use ($app) {
