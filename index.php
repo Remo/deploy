@@ -94,20 +94,23 @@ $app->get('/repository/incremental_deploy/{target_id}/{commit_id}', function($ta
 
 $app->get('/repository/initial_deploy/{target_id}', function($target_id) use ($app) {
 
-    $st = $app['pdo']->prepare("SELECT dt.id, r.local_path, r.path FROM deployment_targets dt INNER JOIN repositories r ON r.id=dt.repository_id WHERE id=:target_id");
+    $st = $app['pdo']->prepare("SELECT dt.id, r.local_path, r.path FROM deployment_targets dt INNER JOIN repositories r ON r.id=dt.repository_id WHERE dt.id=:target_id");
     $st->execute(array('target_id' => $target_id));
 
     $deployment_target = $st->fetch(PDO::FETCH_ASSOC);
     
     // clone repository
     $gitCloneDirectory = $deployment_target['local_path'];
-    exec(GIT_BINARY . 'clone ' . $deployment_target['path'] . '"' . $gitCloneDirectory . '"');
+       
+    exec(GIT_BINARY . ' clone ' . $deployment_target['path'] . ' "' . $gitCloneDirectory . '"');
+    
     chdir($gitCloneDirectory);
         
     // get all files from repository
     $files = array();
-    exec(GIT_BINARY . ' ls-files', $files);
     
+    exec(GIT_BINARY . ' ls-files', $files);
+
     $st = $app['pdo']->prepare("INSERT INTO deployment_queue (target_id, file, action) VALUES (:target_id, :file, 'upload')");
     foreach ($files as $file) {
         $st->execute(array(
@@ -156,20 +159,22 @@ $app->post('/cronjob/get_deployment_status/{target_id}', function($target_id) us
 })->bind("get_deployment_status");
 
 $app->get('/cronjob/process_queue', function() use ($app) {
-    
-    $gitCloneDirectory = 'C:\Users\Remo Laubacher\Documents\NetBeansProjects\Deploy_Silex\temp\redinvest';
-    
+        
     $ftpConnections = array();
     $ftpDirectories = array();
     
-    $st = $app['pdo']->prepare("SELECT dq.id, dq.file, dq.action, dt.id target_id, dt.server, dt.username, dt.password, dt.directory FROM deployment_queue dq
+    $st = $app['pdo']->prepare("SELECT dq.id, dq.file, dq.action, dt.id target_id, dt.server, dt.username, dt.password, dt.directory, r.local_path
+        FROM deployment_queue dq
         INNER JOIN deployment_targets dt ON dq.target_id=dt.id
-        WHERE state='pending' ORDER BY dq.id LIMIT 0,2");
+        INNER JOIN repositories r ON r.id=dt.repository_id
+        WHERE dq.state='pending' ORDER BY dq.id LIMIT 0,100");
     $st->execute();
 
     $stUpdate = $app['pdo']->prepare("UPDATE deployment_queue SET state='deployed' WHERE id=:id");
     
     while ($row = $st->fetch(PDO::FETCH_ASSOC)) {
+
+        $gitCloneDirectory = $row['local_path'];
         
         if (!array_key_exists($row['target_id'], $ftpConnections)) {
             $ftpConnections[$row['target_id']] = ftp_connect($row['server']);
