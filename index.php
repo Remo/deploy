@@ -118,6 +118,9 @@ $app->get('/repository/incremental_deploy/{target_id}/{commit_id}', function($ta
         }
     }
     
+    $st = $app['pdo']->prepare("UPDATE deployment_targets SET last_deployed_commit=:last_deployed_commit, date_last_deployment=now() WHERE id=:target_id");
+    $st->execute(array('last_deployed_commit' => $commit_id, 'target_id' => $target_id));
+    
     return $app['twig']->render('repository_initial_deploy.twig', array(
         'deployment_target' => $deployment_target
     ));       
@@ -151,7 +154,7 @@ $app->get('/repository/initial_deploy/{target_id}', function($target_id) use ($a
     }
     
     // get last commit id
-    exec(GIT_BINARY . 'log -n 1 --pretty=format:%H', $output);
+    exec(GIT_BINARY . ' log -n 1 --pretty=format:%H', $output);
     $st = $app['pdo']->prepare("UPDATE deployment_targets SET last_deployed_commit=:last_deployed_commit, date_last_deployment=now() WHERE id=:target_id");
     $st->execute(array('last_deployed_commit' => $output[0], 'target_id' => $target_id));
         
